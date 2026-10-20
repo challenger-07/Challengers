@@ -1,0 +1,115 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CHALLENGER Meet</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 16px;
+      background: #10131b;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    .panel {
+      max-width: 800px;
+      margin: auto;
+    }
+    input, button {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 13px;
+      margin: 6px 0;
+      border-radius: 10px;
+      border: 1px solid #454b5b;
+      font-size: 16px;
+    }
+    button {
+      background: #d4a62a;
+      color: #10131b;
+      font-weight: bold;
+      border: 0;
+    }
+    #meeting {
+      margin-top: 16px;
+      width: 100%;
+      height: 65vh;
+      min-height: 360px;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    #status { color: #c9ceda; }
+  </style>
+</head>
+<body>
+  <main class="panel">
+    <h1>CHALLENGER Meet</h1>
+    <p>Enter the same room code to meet together.</p>
+
+    <input id="room" placeholder="Enter meeting room code"
+           maxlength="60" autocomplete="off">
+
+    <button id="join">Join Meeting</button>
+    <p id="status">Ready to join</p>
+    <div id="meeting"></div>
+  </main>
+
+  <script>
+    const joinButton = document.getElementById("join");
+    const roomInput = document.getElementById("room");
+    const statusText = document.getElementById("status");
+    let api = null;
+
+    joinButton.addEventListener("click", () => {
+      const code = roomInput.value.trim()
+        .replace(/[^a-zA-Z0-9_-]/g, "");
+
+      if (code.length < 4) {
+        statusText.textContent =
+          "Enter a room code with at least 4 characters.";
+        return;
+      }
+
+      if (!window.JitsiMeetExternalAPI) {
+        statusText.textContent = "Loading meeting service...";
+        const script = document.createElement("script");
+        script.src = "https://meet.jit.si/external_api.js";
+        script.onload = startMeeting;
+        script.onerror = () => {
+          statusText.textContent = "Could not load meeting service.";
+        };
+        document.head.appendChild(script);
+      } else {
+        startMeeting();
+      }
+
+      function startMeeting() {
+        if (!window.JitsiMeetExternalAPI) return;
+
+        if (api) api.dispose();
+
+        document.getElementById("meeting").innerHTML = "";
+        api = new JitsiMeetExternalAPI("meet.jit.si", {
+          roomName: "CHALLENGER_" + code,
+          parentNode: document.getElementById("meeting"),
+          width: "100%",
+          height: "100%",
+          configOverwrite: {
+            prejoinPageEnabled: true,
+            startWithAudioMuted: true,
+            startWithVideoMuted: true
+          },
+          interfaceConfigOverwrite: {
+            MOBILE_APP_PROMO: false
+          }
+        });
+
+        statusText.textContent =
+          "Meeting opened. Allow camera and microphone when asked.";
+      }
+    });
+  </script>
+</body>
+</html>
