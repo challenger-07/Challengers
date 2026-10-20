@@ -1,0 +1,9 @@
+{
+  "appId": "com.challenger.live",
+  "appName": "Challenger",
+  "webDir": "www",
+  "server": {
+    "url": "https://challengers-live.netlify.app",
+    "cleartext": false
+  }
+}
