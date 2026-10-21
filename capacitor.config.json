@@ -7,3 +7,4 @@
     "cleartext": false
   }
 }
+npm i @capacitor/local-notifications
